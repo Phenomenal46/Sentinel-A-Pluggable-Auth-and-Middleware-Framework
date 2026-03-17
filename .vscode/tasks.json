@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build Sentinel Engine",
+            "command": "g++",
+            "args": [
+                "-g",
+                // 1. Compile the main customer
+                "${workspaceFolder}\\main.cpp", 
+                
+                // 2. Compile the Auth folder
+                "${workspaceFolder}\\src\\auth\\*.cpp",
+                
+                // 3. Compile the Models folder (User and Role)
+                "${workspaceFolder}\\src\\models\\*.cpp",
+                
+                // 4. Output the meal
+                "-o",
+                "${workspaceFolder}\\sentinel.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compiler for Sentinel RBAC Engine"
+        }
+    ]
+}

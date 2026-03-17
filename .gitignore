@@ -1,0 +1,36 @@
+# Build outputs
+*.exe
+*.out
+*.o
+*.obj
+*.dll
+*.so
+*.a
+*.lib
+*.pdb
+*.ilk
+
+# Common build folders
+build/
+bin/
+dist/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+Makefile
+
+# VS Code local settings (keep shareable task/debug files)
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs/temp
+*.log
+*.tmp
+*.cache
