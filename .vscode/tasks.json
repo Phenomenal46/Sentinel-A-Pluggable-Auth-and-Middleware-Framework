@@ -8,15 +8,13 @@
             "args": [
                 "-g",
                 // 1. Compile the main customer
-                "${workspaceFolder}\\main.cpp", 
-                
+                "${workspaceFolder}\\main.cpp",
                 // 2. Compile the Auth folder
                 "${workspaceFolder}\\src\\auth\\*.cpp",
-                
                 // 3. Compile the Models folder (User and Role)
                 "${workspaceFolder}\\src\\models\\*.cpp",
-                
-                // 4. Output the meal
+                "${workspaceFolder}\\src\\middleware\\*.cpp",
+                // 4. Output the executable
                 "-o",
                 "${workspaceFolder}\\sentinel.exe"
             ],

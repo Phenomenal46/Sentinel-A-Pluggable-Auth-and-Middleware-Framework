@@ -1,38 +1,50 @@
 #include <iostream>
-#include "include/auth/LocalDatabaseAuth.h"
+#include <vector>
 #include "include/models/User.h"
+#include "include/models/UserFactory.h"
 #include "include/models/Role.h"
+#include "include/middleware/IMiddleware.h"
+#include "include/middleware/LoggingMiddleware.h"
+#include "include/middleware/RoleCheckMiddleware.h"
 
 using namespace std;
 
 int main() {
-    cout << "--- Sentinel RBAC Engine ---" << endl;
+    cout << "--- Sentinel Pipeline Engine ---" << endl;
 
-    // 1. Create our Roles and assign Permissions
-    Role adminRole("Administrator");
-    adminRole.addPermission("READ_FILES");
-    adminRole.addPermission("DELETE_USERS");
-    adminRole.addPermission("SHUTDOWN_SERVER");
+    // Look how incredibly clean this is now! 
+    // The Factory handles all the permission logic internally.
+    User alice = UserFactory::createUser("admin_alice", "Admin");
+    User bob = UserFactory::createUser("guest_bob", "Guest");
 
-    Role internRole("Intern");
-    internRole.addPermission("READ_FILES");
-    // Interns CANNOT delete users or shutdown servers!
+    // 2. Build the Pluggable Middleware Pipeline 
+    // We use a vector of Interface pointers so we can mix and match different checkpoints! 
+    vector<IMiddleware*> pipeline;
+    pipeline.push_back(new LoggingMiddleware());
+    pipeline.push_back(new RoleCheckMiddleware());
 
-    // 2. Create Users using COMPOSITION (Giving them a Role)
-    User alice("admin_alice", adminRole);
-    User bob("intern_bob", internRole);
-
-    // 3. Test our O(1) Permission System
-    cout << "\n[Checking Permissions for Alice (" << alice.getUsername() << ")]" << endl;
-    if (alice.can("DELETE_USERS")) {
-        cout << "SUCCESS: Alice can delete users." << endl;
+    // 3. Process a Request! 
+    string requestedAction = "DELETE_USERS";
+    cout << "\n--- Bob attempts to " << requestedAction << " ---" << endl;
+    
+    bool requestSuccess = true;
+    for (IMiddleware* middleware : pipeline) {
+        // If any middleware returns false, the chain breaks!
+        if (!middleware->process(bob, requestedAction)) {
+            requestSuccess = false;
+            break; 
+        }
     }
 
-    cout << "\n[Checking Permissions for Bob (" << bob.getUsername() << ")]" << endl;
-    if (bob.can("DELETE_USERS")) {
-        cout << "SUCCESS: Bob can delete users." << endl;
+    if (requestSuccess) {
+        cout << ">>> ACTION EXECUTED: " << requestedAction << " <<<" << endl;
     } else {
-        cout << "ACCESS DENIED: Bob does not have permission to delete users." << endl;
+        cout << ">>> ACTION BLOCKED BY PIPELINE <<<" << endl;
+    }
+
+    // 4. Memory Cleanup
+    for (IMiddleware* middleware : pipeline) {
+        delete middleware;
     }
 
     return 0;
